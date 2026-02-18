@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { SearchBar } from "@/components/search-bar";
-import { Map, BookOpen, FileText, FolderKanban } from "lucide-react";
+import { Map, BookOpen, FileText, Newspaper, FolderKanban } from "lucide-react";
 import { getLevelColor } from "@/lib/utils";
 
 export default async function HomePage() {
@@ -38,7 +38,7 @@ export default async function HomePage() {
       <section className="py-8 sm:py-12 border-b">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl 2xl:max-w-8xl">
           <h2 className="text-xl sm:text-2xl font-semibold mb-4 sm:mb-6">Explore by category</h2>
-          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-5 gap-3 sm:gap-4">
             <Link href="/roadmaps?type=role">
               <Card className="h-full card-hover cursor-pointer border-0 shadow-sm">
                 <CardHeader className="pb-2">
@@ -72,6 +72,15 @@ export default async function HomePage() {
                   <FileText className="h-8 w-8 text-primary mb-2" />
                   <CardTitle className="text-sm sm:text-base">Guides</CardTitle>
                   <CardDescription className="text-xs sm:text-sm line-clamp-2">MDX articles, tutorials, and best practices</CardDescription>
+                </CardHeader>
+              </Card>
+            </Link>
+            <Link href="/blog">
+              <Card className="h-full card-hover cursor-pointer border-0 shadow-sm">
+                <CardHeader className="pb-2">
+                  <Newspaper className="h-8 w-8 text-primary mb-2" />
+                  <CardTitle className="text-sm sm:text-base">Blog</CardTitle>
+                  <CardDescription className="text-xs sm:text-sm line-clamp-2">Updates, insights, and articles on AI</CardDescription>
                 </CardHeader>
               </Card>
             </Link>

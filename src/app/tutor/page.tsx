@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback, useMemo, memo } from "react";
 import Link from "next/link";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -14,7 +14,7 @@ interface Message {
 }
 
 /** Renders tutor message with **bold** and [text](href) links */
-function MessageContent({ content }: { content: string }) {
+const MessageContent = memo(function MessageContent({ content }: { content: string }) {
   const segments: React.ReactNode[] = [];
   const linkRegex = /\[([^\]]+)\]\(([^)]+)\)/g;
   let lastIndex = 0;
@@ -59,7 +59,7 @@ function MessageContent({ content }: { content: string }) {
       {segments}
     </div>
   );
-}
+});
 
 export default function TutorPage() {
   const [messages, setMessages] = useState<Message[]>([
@@ -70,22 +70,24 @@ export default function TutorPage() {
     },
   ]);
 
-  const suggestedPrompts = [
+  const suggestedPrompts = useMemo(() => [
     "Recommend a roadmap for beginners",
     "Create a weekly study plan",
     "Suggest projects for RAG",
     "What should I learn for an AI Engineer job?",
-  ];
+  ], []);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
+  const loadingRef = useRef(loading);
+  loadingRef.current = loading;
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  const submitMessage = async (userMessage: string) => {
-    if (!userMessage.trim() || loading) return;
+  const submitMessage = useCallback(async (userMessage: string) => {
+    if (!userMessage.trim() || loadingRef.current) return;
     setInput("");
     setMessages((m) => [...m, { role: "user", content: userMessage }]);
     setLoading(true);
@@ -103,12 +105,12 @@ export default function TutorPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = useCallback((e: React.FormEvent) => {
     e.preventDefault();
     submitMessage(input.trim());
-  };
+  }, [input, submitMessage]);
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-3xl">

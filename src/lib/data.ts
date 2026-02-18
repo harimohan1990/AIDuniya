@@ -7,6 +7,7 @@ import {
   fallbackRoadmapDetail,
   fallbackCourses,
   fallbackGuides,
+  fallbackBlogPosts,
   fallbackProjects,
 } from "./fallback-data";
 
@@ -214,6 +215,52 @@ export async function getGuide(slug: string) {
     return prisma.guide.findUnique({ where: { slug } });
   } catch {
     return fallbackGuides.find((g) => g.slug === slug) ?? null;
+  }
+}
+
+export async function getBlogPosts(search?: string) {
+  const ok = await safeCheckDb();
+  if (!ok) {
+    let list = [...fallbackBlogPosts];
+    if (search?.trim()) {
+      const q = search.trim().toLowerCase();
+      list = list.filter(
+        (b) =>
+          b.title.toLowerCase().includes(q) ||
+          (b.excerpt ?? "").toLowerCase().includes(q) ||
+          b.tags.some((t) => t.toLowerCase().includes(q))
+      );
+    }
+    return list.sort((a, b) => a.order - b.order);
+  }
+  try {
+    const where = search?.trim()
+      ? {
+          OR: [
+            { title: { contains: search.trim(), mode: "insensitive" as const } },
+            { excerpt: { contains: search.trim(), mode: "insensitive" as const } },
+            { tags: { has: search.trim() } },
+          ],
+        }
+      : {};
+    return prisma.blogPost.findMany({
+      where,
+      orderBy: [{ publishedAt: "desc" }, { order: "asc" }, { title: "asc" }],
+    });
+  } catch {
+    return fallbackBlogPosts.sort((a, b) => a.order - b.order);
+  }
+}
+
+export async function getBlogPost(slug: string) {
+  const ok = await safeCheckDb();
+  if (!ok) {
+    return fallbackBlogPosts.find((b) => b.slug === slug) ?? null;
+  }
+  try {
+    return prisma.blogPost.findUnique({ where: { slug } });
+  } catch {
+    return fallbackBlogPosts.find((b) => b.slug === slug) ?? null;
   }
 }
 

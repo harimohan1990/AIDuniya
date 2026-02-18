@@ -1,9 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo, memo } from "react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -11,9 +10,65 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Check, ExternalLink, BookOpen, FileText, Video } from "lucide-react";
+import { ExternalLink, BookOpen, FileText, Video } from "lucide-react";
 import { getLevelColor } from "@/lib/utils";
 import { useProgress } from "@/hooks/use-progress";
+
+function NodeContent({ content }: { content: string }) {
+  const formatBold = (text: string) => {
+    const parts = text.split(/(\*\*[^*]+\*\*)/g);
+    return parts.map((p, i) =>
+      p.startsWith("**") && p.endsWith("**") ? (
+        <strong key={i} className="text-foreground font-medium">{p.slice(2, -2)}</strong>
+      ) : (
+        <span key={i}>{p}</span>
+      )
+    );
+  };
+  const blocks = content.split(/\n\n+/);
+  return (
+    <div className="space-y-4 text-sm">
+      {blocks.map((block, i) => {
+        const trimmed = block.trim();
+        if (!trimmed) return null;
+        const lines = trimmed.split("\n");
+        const bullets = lines.filter((l) => /^[•\-]\s/.test(l));
+        if (bullets.length > 0) {
+          return (
+            <div key={i} className="space-y-2">
+              {lines[0] && !lines[0].startsWith("•") && !lines[0].startsWith("-") && (
+                <p className="text-muted-foreground">{formatBold(lines[0])}</p>
+              )}
+              <ul className="list-disc list-inside space-y-1 text-muted-foreground ml-1">
+                {bullets.map((b, j) => (
+                  <li key={j}>{formatBold(b.replace(/^[•\-]\s*/, ""))}</li>
+                ))}
+              </ul>
+            </div>
+          );
+        }
+        return (
+          <p key={i} className="text-muted-foreground leading-relaxed">
+            {formatBold(trimmed)}
+          </p>
+        );
+      })}
+    </div>
+  );
+}
+
+function ResourceIcon({ type }: { type?: string }) {
+  switch (type) {
+    case "course":
+      return <BookOpen className="h-3.5 w-3.5 text-primary" />;
+    case "article":
+      return <FileText className="h-3.5 w-3.5 text-amber-600" />;
+    case "video":
+      return <Video className="h-3.5 w-3.5 text-red-500" />;
+    default:
+      return <ExternalLink className="h-3.5 w-3.5" />;
+  }
+}
 
 interface RoadmapNodeCardProps {
   roadmapId: string;
@@ -27,76 +82,21 @@ interface RoadmapNodeCardProps {
   compact?: boolean;
 }
 
-export function RoadmapNodeCard({ roadmapId, node, compact }: RoadmapNodeCardProps) {
+function RoadmapNodeCardInner({ roadmapId, node, compact }: RoadmapNodeCardProps) {
   const [open, setOpen] = useState(false);
   const { status, toggleProgress, isLoading } = useProgress(roadmapId, node.id);
 
-  let resources: { type?: string; title?: string; url?: string }[] = [];
-  try {
-    resources = node.resources
-      ? (JSON.parse(node.resources) as { type?: string; title?: string; url?: string }[])
-      : [];
-  } catch {
-    resources = [];
-  }
+  const resources = useMemo(() => {
+    try {
+      return node.resources
+        ? (JSON.parse(node.resources) as { type?: string; title?: string; url?: string }[])
+        : [];
+    } catch {
+      return [];
+    }
+  }, [node.resources]);
 
   const isCompleted = status === "COMPLETED";
-
-  function NodeContent({ content }: { content: string }) {
-    const formatBold = (text: string) => {
-      const parts = text.split(/(\*\*[^*]+\*\*)/g);
-      return parts.map((p, i) =>
-        p.startsWith("**") && p.endsWith("**") ? (
-          <strong key={i} className="text-foreground font-medium">{p.slice(2, -2)}</strong>
-        ) : (
-          <span key={i}>{p}</span>
-        )
-      );
-    };
-    const blocks = content.split(/\n\n+/);
-    return (
-      <div className="space-y-4 text-sm">
-        {blocks.map((block, i) => {
-          const trimmed = block.trim();
-          if (!trimmed) return null;
-          const lines = trimmed.split("\n");
-          const bullets = lines.filter((l) => /^[•\-]\s/.test(l));
-          if (bullets.length > 0) {
-            return (
-              <div key={i} className="space-y-2">
-                {lines[0] && !lines[0].startsWith("•") && !lines[0].startsWith("-") && (
-                  <p className="text-muted-foreground">{formatBold(lines[0])}</p>
-                )}
-                <ul className="list-disc list-inside space-y-1 text-muted-foreground ml-1">
-                  {bullets.map((b, j) => (
-                    <li key={j}>{formatBold(b.replace(/^[•\-]\s*/, ""))}</li>
-                  ))}
-                </ul>
-              </div>
-            );
-          }
-          return (
-            <p key={i} className="text-muted-foreground leading-relaxed">
-              {formatBold(trimmed)}
-            </p>
-          );
-        })}
-      </div>
-    );
-  }
-
-  const ResourceIcon = ({ type }: { type?: string }) => {
-    switch (type) {
-      case "course":
-        return <BookOpen className="h-3.5 w-3.5 text-primary" />;
-      case "article":
-        return <FileText className="h-3.5 w-3.5 text-amber-600" />;
-      case "video":
-        return <Video className="h-3.5 w-3.5 text-red-500" />;
-      default:
-        return <ExternalLink className="h-3.5 w-3.5" />;
-    }
-  };
 
   return (
     <>
@@ -198,3 +198,5 @@ export function RoadmapNodeCard({ roadmapId, node, compact }: RoadmapNodeCardPro
     </>
   );
 }
+
+export const RoadmapNodeCard = memo(RoadmapNodeCardInner);

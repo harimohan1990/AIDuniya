@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
+import { useCallback } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -37,23 +38,23 @@ export function CourseFilters() {
   const type = searchParams.get("type") ?? "__all__";
   const provider = searchParams.get("provider") ?? "__all__";
 
-  const updateFilters = (key: string, value: string) => {
+  const updateFilters = useCallback((key: string, value: string) => {
     const params = new URLSearchParams(searchParams.toString());
     if (value && value !== "__all__") params.set(key, value);
     else params.delete(key);
     router.push(`/courses?${params.toString()}`);
-  };
+  }, [searchParams, router]);
 
-  const handleSearch = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSearch = useCallback((e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const form = e.currentTarget;
     const input = form.querySelector<HTMLInputElement>('input[name="search"]');
     if (input) updateFilters("search", input.value);
-  };
+  }, [updateFilters]);
 
-  const clearFilters = () => {
+  const clearFilters = useCallback(() => {
     router.push("/courses");
-  };
+  }, [router]);
 
   return (
     <Card>

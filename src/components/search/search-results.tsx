@@ -1,5 +1,6 @@
 "use client";
 
+import { memo } from "react";
 import Link from "next/link";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -14,7 +15,7 @@ interface SearchResultsProps {
   projects: { id: string; title: string; level: string; description: string }[];
 }
 
-export function SearchResults({
+function SearchResultsInner({
   query,
   courses,
   roadmaps,
@@ -154,3 +155,5 @@ export function SearchResults({
     </div>
   );
 }
+
+export const SearchResults = memo(SearchResultsInner);

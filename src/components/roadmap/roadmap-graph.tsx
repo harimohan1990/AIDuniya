@@ -107,7 +107,7 @@ export function RoadmapGraph({ roadmapId, nodes, edges }: RoadmapGraphProps) {
 
   const { positions, paths, width: graphWidth, height: graphHeight } = graphData;
 
-  const nodeList = nodes.map((n) => {
+  const nodeList = useMemo(() => nodes.map((n) => {
     const pos = positions.get(n.id);
     if (!pos) return null;
     return (
@@ -124,7 +124,7 @@ export function RoadmapGraph({ roadmapId, nodes, edges }: RoadmapGraphProps) {
         <RoadmapNodeCard roadmapId={roadmapId} node={n} compact />
       </div>
     );
-  });
+  }), [nodes, positions, roadmapId]);
 
   return (
     <>

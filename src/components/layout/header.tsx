@@ -1,5 +1,6 @@
 "use client";
 
+import { memo } from "react";
 import Link from "next/link";
 import { useSession, signIn, signOut } from "next-auth/react";
 import { Button } from "@/components/ui/button";
@@ -10,10 +11,10 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Search, GraduationCap, BookOpen, Map, FolderKanban, Bot } from "lucide-react";
+import { Search, GraduationCap, BookOpen, Map, FolderKanban, Bot, Newspaper } from "lucide-react";
 import { MobileNav } from "./mobile-nav";
 
-export function Header() {
+function HeaderInner() {
   const { data: session, status } = useSession();
 
   return (
@@ -51,6 +52,13 @@ export function Header() {
             className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
           >
             Guides
+          </Link>
+          <Link
+            href="/blog"
+            className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1"
+          >
+            <Newspaper className="h-4 w-4" />
+            Blog
           </Link>
           <Link
             href="/projects"
@@ -134,3 +142,5 @@ export function Header() {
     </header>
   );
 }
+
+export const Header = memo(HeaderInner);

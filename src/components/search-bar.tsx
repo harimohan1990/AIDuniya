@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
-import { useState, useTransition } from "react";
+import { useState, useTransition, useCallback } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Search } from "lucide-react";
@@ -29,7 +29,7 @@ export function SearchBar({
   );
   const [isPending, startTransition] = useTransition();
 
-  const handleSearch = (e: React.FormEvent) => {
+  const handleSearch = useCallback((e: React.FormEvent) => {
     e.preventDefault();
     const params = new URLSearchParams();
     if (query.trim()) {
@@ -38,7 +38,7 @@ export function SearchBar({
     startTransition(() => {
       router.push(`${searchPath}${params.toString() ? `?${params.toString()}` : ""}`);
     });
-  };
+  }, [query, param, searchPath, router]);
 
   return (
     <form onSubmit={handleSearch} className="flex flex-col sm:flex-row gap-2 w-full">

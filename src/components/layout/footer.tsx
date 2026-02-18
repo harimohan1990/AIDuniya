@@ -6,6 +6,7 @@ const footerLinks = {
     { href: "/roadmaps", label: "Roadmaps" },
     { href: "/courses", label: "Courses" },
     { href: "/guides", label: "Guides" },
+    { href: "/blog", label: "Blog" },
     { href: "/projects", label: "Projects" },
     { href: "/tutor", label: "AI Tutor" },
     { href: "/search", label: "Search" },

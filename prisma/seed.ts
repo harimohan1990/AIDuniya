@@ -13,6 +13,7 @@ async function main() {
   await prisma.roadmap.deleteMany();
   await prisma.course.deleteMany();
   await prisma.guide.deleteMany();
+  await prisma.blogPost.deleteMany();
   await prisma.projectIdea.deleteMany();
 
   const hashedPassword = await bcrypt.hash("admin123", 12);
@@ -249,7 +250,7 @@ async function main() {
       content: "Scale RAG for real users. Optimize latency, improve retrieval quality, and handle updates.\n\n**Retrieval optimization:** Reranking (Cohere, cross-encoder), query expansion, multi-query\n**Latency:** Caching, async indexing, batch inference\n**Evaluation:** Relevance, faithfulness, answer correctness\n**Updates:** Incremental indexing, re-indexing strategies\n\n**Week-by-week syllabus:**\n• Week 1: Reranking, query expansion, retrieval quality\n• Week 2: Caching, latency optimization, cost control\n• Week 3: Evals, A/B testing RAG variants\n• Week 4: Incremental updates, re-indexing pipelines\n\n**Industry project:** Healthcare FAQ bot—RAG over medical guidelines and policies. Ensure citations, handle sensitive data, add disclaimer.",
       difficulty: "advanced",
       order: 2,
-      resources: JSON.stringify([{ type: "article", title: "Advanced RAG (LangChain)", url: "https://python.langchain.com/docs/use_cases/question_answering/" }, { type: "article", title: "RAG Evaluation", url: "https://www.anthropic.com/research/evals" }]),
+      resources: JSON.stringify([{ type: "article", title: "Advanced RAG (LangChain)", url: "https://python.langchain.com/docs/use_cases/question_answering/" }, { type: "article", title: "RAG Evaluation (ARES)", url: "https://arxiv.org/abs/2311.09476" }]),
     },
   });
 
@@ -365,7 +366,7 @@ async function main() {
       content: "Version prompts, A/B test prompts, track which model versions are in production.\n\n**Week-by-week syllabus:**\n• Week 1: Prompt registry, versioning, rollback\n• Week 2: A/B testing prompts and models\n• Week 3: Feature flags, gradual rollout\n\n**Industry project:** Multi-model routing—route by latency/cost/quality. Fallback chains, shadow mode.",
       difficulty: "intermediate",
       order: 1,
-      resources: JSON.stringify([{ type: "article", title: "Prompt Versioning", url: "https://www.anthropic.com/news/prompt-engineering" }]),
+      resources: JSON.stringify([{ type: "article", title: "Prompt Engineering (Anthropic)", url: "https://docs.anthropic.com/en/docs/prompt-engineering" }]),
     },
   });
   const r5n3 = await prisma.roadmapNode.create({
@@ -375,7 +376,7 @@ async function main() {
       content: "LLM evals: relevance, faithfulness, toxicity. Latency, cost, error rate monitoring.\n\n**Week-by-week syllabus:**\n• Week 1: Evals—relevance, faithfulness, toxicity\n• Week 2: Latency, cost, token tracking\n• Week 3: Dashboards, alerts, incident response\n\n**Industry project:** LLM observability platform—log requests, run evals, track drift. Slack alerts on degradation.",
       difficulty: "advanced",
       order: 2,
-      resources: JSON.stringify([{ type: "article", title: "Evaluating LLMs", url: "https://www.deeplearning.ai/the-batch/evaluating-llm-applications/" }]),
+      resources: JSON.stringify([{ type: "article", title: "Evaluating LLMs", url: "https://www.deeplearning.ai/the-batch/we-need-better-evals-for-llm-applications/" }]),
     },
   });
   const r5n4 = await prisma.roadmapNode.create({
@@ -385,7 +386,7 @@ async function main() {
       content: "Caching, batching, fallbacks. Deploying RAG and agent systems at scale.\n\n**Week-by-week syllabus:**\n• Week 1: Response caching, prompt caching\n• Week 2: Batching, async inference, queues\n• Week 3: Fallbacks, multi-region, SLA\n\n**Industry project:** Enterprise chatbot—auth, audit logs, rate limits, PII redaction. Deploy to Kubernetes.",
       difficulty: "advanced",
       order: 3,
-      resources: JSON.stringify([{ type: "course", title: "Production RAG", url: "https://www.deeplearning.ai/short-courses/" }]),
+      resources: JSON.stringify([{ type: "course", title: "Building RAG Applications", url: "https://www.deeplearning.ai/short-courses/building-applications-with-vector-databases/" }]),
     },
   });
 
@@ -417,7 +418,7 @@ async function main() {
     { title: "PyTorch for Deep Learning", provider: "YouTube", url: "https://www.youtube.com/playlist?list=PLZbbT5o_s2xrfNyHZsM6ufI0iZENK9xgG", level: "BEGINNER" as const, type: "FULL" as const, duration: "60 hours", tags: ["PyTorch"] },
     { title: "Prompt Engineering for Developers", provider: "DeepLearning.AI", url: "https://www.deeplearning.ai/short-courses/chatgpt-prompt-engineering-for-developers/", level: "BEGINNER" as const, type: "SHORT" as const, duration: "1 hour", tags: ["prompt engineering"] },
     { title: "Building RAG Applications", provider: "DeepLearning.AI", url: "https://www.deeplearning.ai/short-courses/building-applications-with-vector-databases/", level: "INTERMEDIATE" as const, type: "SHORT" as const, duration: "1 hour", tags: ["RAG", "vector DB"] },
-    { title: "AI Agents", provider: "DeepLearning.AI", url: "https://www.deeplearning.ai/short-courses/building-systems-with-llm-agents/", level: "INTERMEDIATE" as const, type: "SHORT" as const, duration: "1 hour", tags: ["agents", "LLM"] },
+    { title: "AI Agents", provider: "DeepLearning.AI", url: "https://learn.deeplearning.ai/courses/agentic-ai/information", level: "INTERMEDIATE" as const, type: "SHORT" as const, duration: "1 hour", tags: ["agents", "LLM"] },
     { title: "Fine-tuning LLMs", provider: "DeepLearning.AI", url: "https://www.deeplearning.ai/short-courses/finetuning-large-language-models/", level: "ADVANCED" as const, type: "SHORT" as const, duration: "2 hours", tags: ["fine-tuning", "LLM"] },
     { title: "Google AI Essentials", provider: "Google", url: "https://www.coursera.org/learn/google-ai-essentials", level: "BEGINNER" as const, type: "SHORT" as const, duration: "4 hours", tags: ["AI", "Gemini"] },
   ];
@@ -454,6 +455,24 @@ async function main() {
       update: {},
       create: {
         ...guides[i],
+        order: i,
+      },
+    });
+  }
+
+  // Blog posts
+  const blogPosts = [
+    { slug: "welcome-to-aicoursemap", title: "Welcome to AICourseMap", excerpt: "Your structured path to becoming an AI Engineer. Learn how we're building a community-driven platform for AI learning.", contentMDX: "# Welcome to AICourseMap\n\nWe're excited to have you here. AICourseMap is designed to help you navigate the fast-moving world of AI with structured roadmaps, curated courses, and practical projects.\n\n## What We Offer\n\n- **Roadmaps** – Step-by-step paths for roles like AI Engineer and skills like RAG\n- **Courses** – Curated list of the best free and paid courses\n- **Guides** – Practical tutorials and how-tos\n- **Projects** – Hands-on ideas to build your portfolio\n- **AI Tutor** – Get personalized guidance on your learning journey\n\n## Getting Started\n\n1. Browse our [roadmaps](/roadmaps) to find your path\n2. Pick a [course](/courses) that matches your level\n3. Build something from our [project ideas](/projects)\n\nHappy learning!", tags: ["announcement", "getting started"], featured: true },
+    { slug: "llm-trends-2025", title: "LLM Trends to Watch in 2025", excerpt: "From agentic workflows to smaller models—what's shaping the LLM landscape this year.", contentMDX: "# LLM Trends to Watch in 2025\n\nHere are the key trends we're tracking in the large language model space.\n\n## 1. Agentic Workflows\n\nAgents that plan, use tools, and reflect are moving from research to production. Expect more frameworks like LangGraph and CrewAI to mature.\n\n## 2. Smaller, Faster Models\n\nOn-device and edge deployment is heating up. Models under 10B parameters are getting surprisingly capable.\n\n## 3. RAG Everywhere\n\nRetrieval-augmented generation is becoming the default for knowledge-heavy applications. Expect better chunking, reranking, and evaluation tools.\n\n## 4. Multimodal by Default\n\nVision + language models are table stakes. Image understanding, document parsing, and code generation from screenshots are mainstream.\n\n## 5. Cost and Latency Optimization\n\nPrompt caching, speculative decoding, and model routing are reducing costs. Teams are building fallback chains and A/B testing models.\n\n---\n\n*Stay tuned for more updates. Follow our [roadmaps](/roadmaps) to keep learning.*", tags: ["LLM", "trends", "2025"], featured: true },
+    { slug: "rag-vs-finetuning-decision", title: "RAG vs Fine-tuning: A Decision Framework", excerpt: "When to use retrieval-augmented generation versus fine-tuning for your LLM application.", contentMDX: "# RAG vs Fine-tuning: A Decision Framework\n\nChoosing between RAG and fine-tuning is one of the most common questions when building LLM applications. Here's a simple framework.\n\n## Use RAG When\n\n- **Knowledge changes frequently** – Docs, policies, product info\n- **Domain is broad** – You can't fit everything in context\n- **Quick to ship** – No training infrastructure needed\n- **Citation matters** – Users need to see sources\n\n## Use Fine-tuning When\n\n- **Specific output format** – JSON schema, tone, style\n- **Consistent behavior** – Same task, same format every time\n- **Latency critical** – No retrieval step\n- **Narrow, well-defined task** – Classification, extraction\n\n## Combine Both\n\nMany production systems use both:\n- RAG for domain knowledge\n- Fine-tuning for output format and behavior\n\n## Next Steps\n\n- [RAG Architecture Guide](/guides/rag-architecture)\n- [Fine-tuning vs RAG](/guides/fine-tuning-vs-rag)", tags: ["RAG", "fine-tuning", "decision"], featured: false },
+  ];
+
+  for (let i = 0; i < blogPosts.length; i++) {
+    await prisma.blogPost.upsert({
+      where: { slug: blogPosts[i].slug },
+      update: {},
+      create: {
+        ...blogPosts[i],
         order: i,
       },
     });
