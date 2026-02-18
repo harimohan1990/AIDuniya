@@ -1,9 +1,9 @@
-# Render Blueprint for AICourseMap (Next.js + Prisma)
+# Render Blueprint for AIDuniya (Next.js + Prisma)
 # https://render.com/docs/blueprint-spec
 
 services:
   - type: web
-    name: aicoursemap
+    name: aiduniya
     runtime: node
 
     buildCommand: npm ci && npm run build
