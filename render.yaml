@@ -6,7 +6,7 @@ services:
     name: aiduniya
     runtime: node
 
-    buildCommand: npm ci && npm run build
+    buildCommand: npm run build
     startCommand: npm run start
 
     envVars:

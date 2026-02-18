@@ -6,7 +6,7 @@ const nextConfig: NextConfig = {
   output: "standalone",
   transpilePackages: ["next-mdx-remote"],
   outputFileTracingRoot: path.join(process.cwd()),
-  eslint: { ignoreDuringBuilds: true },
+  eslint: { ignoreDuringBuilds: false },
 };
 
 export default nextConfig;
