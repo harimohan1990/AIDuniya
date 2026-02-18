@@ -1,0 +1,20 @@
+# Render Blueprint for AICourseMap (Next.js + Prisma)
+# https://render.com/docs/blueprint-spec
+
+services:
+  - type: web
+    name: aicoursemap
+    runtime: node
+
+    buildCommand: npm ci && npm run build
+    startCommand: npm run start
+
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        sync: false
+      - key: NEXTAUTH_URL
+        sync: false
+      - key: NEXTAUTH_SECRET
+        generateValue: true
