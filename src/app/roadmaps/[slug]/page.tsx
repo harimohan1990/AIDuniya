@@ -5,8 +5,7 @@ export const dynamic = "force-dynamic";
 import { RoadmapGraph } from "@/components/roadmap/roadmap-graph";
 import { RoadmapProgress } from "@/components/roadmap/roadmap-progress";
 import { SaveRoadmapButton } from "@/components/roadmap/save-roadmap-button";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { getSafeSession } from "@/lib/session";
 import { Badge } from "@/components/ui/badge";
 import { Clock, MapPin, BookOpen, Sparkles } from "lucide-react";
 
@@ -16,7 +15,7 @@ export default async function RoadmapDetailPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const session = await getServerSession(authOptions);
+  const session = await getSafeSession();
   const userId = (session?.user as { id?: string })?.id;
   const roadmap = await getRoadmap(slug, userId ?? undefined);
   if (!roadmap) notFound();

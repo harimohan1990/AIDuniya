@@ -10,7 +10,7 @@ const secret =
     ? process.env.NEXTAUTH_SECRET
     : process.env.NODE_ENV === "development"
       ? "dev-secret-replace-in-production"
-      : undefined;
+      : "fallback-secret-configure-nextauth-secret-in-production";
 
 export const authOptions: NextAuthOptions = {
   secret,

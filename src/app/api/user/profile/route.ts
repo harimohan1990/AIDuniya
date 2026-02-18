@@ -1,12 +1,11 @@
 import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { getSafeSession } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 import { userProfileSchema } from "@/lib/validations";
 
 export async function PATCH(req: Request) {
-  const session = await getServerSession(authOptions);
+  const session = await getSafeSession();
   if (!session?.user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }

@@ -1,12 +1,11 @@
 import { redirect } from "next/navigation";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { getSafeSession } from "@/lib/session";
 import Link from "next/link";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { BookOpen, Map, FileText, FolderKanban } from "lucide-react";
 
 export default async function AdminPage() {
-  const session = await getServerSession(authOptions);
+  const session = await getSafeSession();
   if (!session?.user) redirect("/auth/signin");
 
   const role = (session.user as { role?: string }).role;
